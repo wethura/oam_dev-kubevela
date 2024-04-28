@@ -240,17 +240,27 @@ func wrapTransformFunc[T client.Object](fn func(T)) kcache.TransformFunc {
 // This will filter out the unnecessary fields for cached objects and use definition cache
 // to reduce the duplicated storage of same definitions
 func AddInformerTransformFuncToCacheOption(opts *cache.Options) {
+
 	if utilfeature.DefaultMutableFeatureGate.Enabled(features.InformerCacheFilterUnnecessaryFields) {
-		if opts.TransformByObject == nil {
-			opts.TransformByObject = map[client.Object]kcache.TransformFunc{}
+		if opts.ByObject == nil {
+			opts.ByObject = map[client.Object]cache.ByObject{}
 		}
-		opts.TransformByObject[&v1beta1.ApplicationRevision{}] = wrapTransformFunc(func(rev *v1beta1.ApplicationRevision) {
-			if utilfeature.DefaultMutableFeatureGate.Enabled(features.SharedDefinitionStorageForApplicationRevision) {
-				DefaultDefinitionCache.Get().RemapRevision(rev)
-			}
-		})
-		opts.TransformByObject[&v1beta1.Application{}] = wrapTransformFunc(func(app *v1beta1.Application) {})
-		opts.TransformByObject[&v1beta1.ResourceTracker{}] = wrapTransformFunc(func(rt *v1beta1.ResourceTracker) {})
+
+		opts.ByObject[&v1beta1.ApplicationRevision{}] = cache.ByObject{
+			Transform: wrapTransformFunc(func(rev *v1beta1.ApplicationRevision) {
+				if utilfeature.DefaultMutableFeatureGate.Enabled(features.SharedDefinitionStorageForApplicationRevision) {
+					DefaultDefinitionCache.Get().RemapRevision(rev)
+				}
+			}),
+		}
+
+		opts.ByObject[&v1beta1.Application{}] = cache.ByObject{
+			Transform: wrapTransformFunc(func(app *v1beta1.Application) {}),
+		}
+
+		opts.ByObject[&v1beta1.ResourceTracker{}] = cache.ByObject{
+			Transform: wrapTransformFunc(func(rt *v1beta1.ResourceTracker) {}),
+		}
 	}
 }
 

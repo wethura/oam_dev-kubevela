@@ -1,6 +1,6 @@
 module github.com/oam-dev/kubevela
 
-go 1.19
+go 1.22
 
 require (
 	cuelang.org/go v0.5.0
@@ -302,7 +302,18 @@ require (
 replace (
 	cloud.google.com/go => cloud.google.com/go v0.100.2
 	github.com/docker/cli => github.com/docker/cli v20.10.9+incompatible
-	github.com/docker/docker => github.com/moby/moby v20.10.24+incompatible
 	github.com/wercker/stern => github.com/oam-dev/stern v1.13.2
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client => sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.36
+
+)
+
+// Hack fro support more newest package.
+replace (
+	k8s.io/api => k8s.io/api v0.30.0
+	k8s.io/apiserver => k8s.io/apiserver v0.30.0
+	k8s.io/client-go => k8s.io/client-go v0.30.0
+	k8s.io/kms => k8s.io/kms v0.30.0
+	k8s.io/apimachinery => k8s.io/apimachinery v0.30.0
+	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20240423202451-8948a665c108
+	github.com/docker/docker => github.com/moby/moby v26.1.0+incompatible
 )
